@@ -23,6 +23,11 @@ public class Message {
 		if(length > buffer.length - HEADER_LENGTH)
 			throw new TpmpException("Malformed message");
 		
+		if(length == 0) {
+			payload = "";
+			return;
+		}
+		
 		byte[] pl = new byte[length];
 		System.arraycopy(buffer, HEADER_LENGTH, pl, 0, length);
 		payload = new String(pl, StandardCharsets.UTF_8);
@@ -52,10 +57,12 @@ public class Message {
 			throw new TpmpException("Message payload is too long");
 		
 		byte[] buffer = new byte[HEADER_LENGTH + pl.length];
-		System.arraycopy(pl, 0, buffer, HEADER_LENGTH, pl.length);
 		buffer[0] = (byte) ((command << 1) | (payloadType&1));
-		buffer[1] = (byte) (pl.length >> 8);
-		buffer[2] = (byte) pl.length;
+		if(pl.length > 0) {
+			System.arraycopy(pl, 0, buffer, HEADER_LENGTH, pl.length);
+			buffer[1] = (byte) (pl.length >> 8);
+			buffer[2] = (byte) pl.length;
+		}
 		
 		return buffer;
 	}
