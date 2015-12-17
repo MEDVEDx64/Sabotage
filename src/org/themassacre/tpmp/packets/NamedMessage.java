@@ -7,6 +7,8 @@ class NamedMessage extends DecodedMessageBase {
 		super(m);
 		
 		String pl = m.getPayload();
+		if(pl.length() == 0)
+			throw new PayloadFormatException("Missing payload");
 		int idx = pl.indexOf('\n');
 		if(idx < 0)
 			throw new PayloadFormatException("No text field given");
