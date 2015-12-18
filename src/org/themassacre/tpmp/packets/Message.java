@@ -33,7 +33,7 @@ public class Message {
 		payload = new String(pl, StandardCharsets.UTF_8);
 	}
 	
-	public Message(byte payloadType, byte command, String payload) {
+	public Message(int payloadType, int command, String payload) {
 		this.payload = payload;
 		this.payloadType = payloadType;
 		this.command = command;

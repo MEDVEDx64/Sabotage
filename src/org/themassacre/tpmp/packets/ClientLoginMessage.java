@@ -1,7 +1,5 @@
 package org.themassacre.tpmp.packets;
 
-import org.themassacre.tpmp.generic.PayloadFormatException;
-
 public class ClientLoginMessage extends DecodedMessageBase {
 	public ClientLoginMessage(Message m) throws PayloadFormatException {
 		super(m);

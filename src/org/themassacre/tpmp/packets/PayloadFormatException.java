@@ -1,4 +1,6 @@
-package org.themassacre.tpmp.generic;
+package org.themassacre.tpmp.packets;
+
+import org.themassacre.tpmp.generic.TpmpException;
 
 public class PayloadFormatException extends TpmpException {
 	public PayloadFormatException(String msg) {

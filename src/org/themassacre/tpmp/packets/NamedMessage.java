@@ -1,7 +1,5 @@
 package org.themassacre.tpmp.packets;
 
-import org.themassacre.tpmp.generic.PayloadFormatException;
-
 class NamedMessage extends DecodedMessageBase {
 	public NamedMessage(Message m) throws PayloadFormatException {
 		super(m);
