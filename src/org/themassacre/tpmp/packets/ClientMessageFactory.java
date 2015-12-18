@@ -14,13 +14,10 @@ public class ClientMessageFactory {
 				throw new MessageFactoryException("Nickname contains illegal characters");
 		}
 		
-		return new Message(PayloadType.TEXT, ClientCommand.LOGIN, nickname); 
+		return new Message(PayloadType.TEXT, ClientCommand.LOGIN, nickname);
 	}
 	
-	public static Message createPrivateMessage(String recipient, String text)
-			throws MessageFactoryException {
-		if(recipient.indexOf('\n') >= 0)
-			throw new MessageFactoryException("Recipient field contains illegal characters");
+	public static Message createPrivateMessage(String recipient, String text) {
 		return new Message(PayloadType.TEXT, ClientCommand.PRIVATE,
 				recipient + "\n" + text);
 	}
