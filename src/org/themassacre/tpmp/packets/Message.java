@@ -9,6 +9,8 @@ public class Message {
 	private int command;
 	private String payload;
 	
+	private int plLength = -1;
+	
 	public static final int HEADER_LENGTH = 3;
 	public static final int MAX_PAYLOAD_LENGTH = 0x3fff;
 	
@@ -21,7 +23,7 @@ public class Message {
 		int length = buffer[2];
 		length |= (buffer[1] << 8);
 		if(length > buffer.length - HEADER_LENGTH)
-			throw new TpmpException("Malformed message");
+			throw new TruncatedMessageException("Message seems to be not received fully");
 		
 		if(length == 0) {
 			payload = "";
@@ -31,6 +33,7 @@ public class Message {
 		byte[] pl = new byte[length];
 		System.arraycopy(buffer, HEADER_LENGTH, pl, 0, length);
 		payload = new String(pl, StandardCharsets.UTF_8);
+		plLength = length;
 	}
 	
 	public Message(int payloadType, int command, String payload) {
@@ -51,8 +54,12 @@ public class Message {
 		return command;
 	}
 	
+	private byte[] createByteArray() {
+		return payload.getBytes(StandardCharsets.UTF_8);
+	}
+	
 	public byte[] toByteArray() throws TpmpException {
-		byte[] pl = payload.getBytes(StandardCharsets.UTF_8);
+		byte[] pl = createByteArray();
 		if(pl.length > MAX_PAYLOAD_LENGTH)
 			throw new TpmpException("Message payload is too long");
 		
@@ -65,5 +72,11 @@ public class Message {
 		}
 		
 		return buffer;
+	}
+	
+	public int getPayloadLength() {
+		if(plLength == -1)
+			plLength = createByteArray().length;
+		return plLength;
 	}
 }
