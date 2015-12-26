@@ -14,7 +14,7 @@ public class Message {
 	public static final int HEADER_LENGTH = 3;
 	public static final int MAX_PAYLOAD_LENGTH = 0x3fff;
 	
-	public Message(byte[] buffer) throws TpmpException { 
+	public Message(byte[] buffer) throws TpmpException {
 		if(buffer.length < HEADER_LENGTH)
 			throw new TpmpException("Message is too short");
 		
