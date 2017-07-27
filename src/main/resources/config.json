@@ -1,0 +1,15 @@
+{
+	"applications":
+	[
+		{
+			"class": "org.themassacre.sabotage.apps.core.ServerCoreApplication",
+			"name": "TPMP server",
+			"enabled": true,
+			"critical": true,
+			"settings":
+			{
+				"port": 11070
+			}
+		}
+	]
+}
