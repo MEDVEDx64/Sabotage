@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.*;
 import org.json.*;
+import org.themassacre.sabotage.apps.Application;
 
 public class Launcher extends Thread {
 	final static Logger logger = LogManager.getLogger(Launcher.class);
@@ -15,10 +16,17 @@ public class Launcher extends Thread {
 	List<AppContainer> applications = new ArrayList<AppContainer>();
 
 	public Launcher() {
-		logger.info("Sabotage TPMP server is starting");
-		
-		try(InputStream cfRes = Launcher.class.getResourceAsStream("config.json")) {
-			config = new JSONObject(cfRes);
+		try(BufferedReader cfRes = new BufferedReader(
+				new InputStreamReader(Launcher.class.getResourceAsStream("/config.json")))) {
+			StringBuffer buf = new StringBuffer();
+			String line;
+			while(true) {
+				line = cfRes.readLine();
+				if(line == null) break;
+				buf.append(line);
+			}
+			
+			config = new JSONObject(buf.toString());
 		}
 		
 		catch(Exception e) {
@@ -54,10 +62,40 @@ public class Launcher extends Thread {
 	void up() {
 		JSONArray appList = config.getJSONArray("applications");
 		for(int i = 0; i < appList.length(); i++) {
+			JSONObject appObject = appList.getJSONObject(i);
+			if(!appObject.getBoolean("enabled")) continue;
+			boolean critical = appObject.getBoolean("critical");
+			String name = appObject.getString("name");
+			logger.info("Starting " + name);
+			
+			try {
+				AppContainer container = new AppContainer(appObject.getString("class"), name);
+				Application app = container.getApplication();
+				app.configure(appObject.getJSONObject("settings"));
+				if(!app.up()) {
+					throw new Exception("Entry point invocation returned error status");
+				}
+				
+				applications.add(container);
+				
+			} catch(Exception e) {
+				if(critical) {
+					logger.fatal("Failed to instantiate mission-critical application " + name + ": " + e);
+					System.exit(-1);
+				} else {
+					logger.error("Failed to instantiate application " + name + ": " + e);
+				}
+			}
 		}
 	}
 	
 	void down() {
+		for(AppContainer container: applications) {
+			logger.info("Stopping " + container.getName());
+			container.getApplication().down();
+		}
+		
+		applications.clear();
 	}
 	
 	// The shutdown hook

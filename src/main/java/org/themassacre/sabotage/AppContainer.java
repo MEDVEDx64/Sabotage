@@ -8,22 +8,13 @@ import org.themassacre.sabotage.apps.Application;
 public class AppContainer {
 	final static Logger logger = LogManager.getLogger(AppContainer.class);
 	
-	Application app;
-	String clName;
-	String dsName;
-	boolean crit = false;
+	private Application app;
+	private String clName;
+	private String dsName;
 	
 	public AppContainer(String className, String displayName) throws AppInstantiationException {
 		clName = className;
 		dsName = displayName;
-		
-		instantiate();
-	}
-	
-	public AppContainer(String className, String displayName, boolean crit) throws AppInstantiationException {
-		clName = className;
-		dsName = displayName;
-		this.crit = crit;
 		
 		instantiate();
 	}
@@ -48,9 +39,5 @@ public class AppContainer {
 	
 	public String getName() {
 		return dsName;
-	}
-	
-	public boolean isCritical() {
-		return crit;
 	}
 }
