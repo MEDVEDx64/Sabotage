@@ -48,9 +48,14 @@ public class ClientInstance extends Thread {
 			server.getClients().remove(this);
 			
 			try {
+				server.broadcast(getUserList().toByteArray());
+				server.broadcast(ServerMessageFactory
+						.createNotificationMessage(nickName + " left").toByteArray());
+				
 				logger.info("Disconnecting");
 				socket.close();
-			} catch(IOException eIO) {
+			} catch(Exception e) {
+				logger.warn("User was not disconnected gracefully: " + e);
 			}
 		}
 	}
@@ -58,7 +63,22 @@ public class ClientInstance extends Thread {
 	private void handleMessage(Message msg) throws IOException, TpmpException {
 		switch(msg.getCommand()) {
 		case ClientCommand.LOGIN: {
-			nickName = new ClientLoginMessage(msg).getNickname();
+			String _nickName = new ClientLoginMessage(msg).getNickname();
+			if(find(_nickName) != null) {
+				send(ServerMessageFactory.createNotificationMessage("Nickname already in use").toByteArray());
+				break;
+			}
+			
+			if(nickName == null) {
+				server.broadcast(ServerMessageFactory
+						.createNotificationMessage(_nickName + " joined").toByteArray());
+			} else {
+				server.broadcast(ServerMessageFactory
+						.createNotificationMessage(nickName + " is now known as " + _nickName).toByteArray());
+			}
+			
+			nickName = _nickName;
+			server.broadcast(getUserList().toByteArray());
 			break;
 		}
 		
@@ -82,12 +102,7 @@ public class ClientInstance extends Thread {
 		}
 		
 		case ClientCommand.USERLIST: {
-			List<String> names = new ArrayList<String>();
-			for(ClientInstance c: server.getClients()) {
-				names.add(c.getNickName());
-			}
-			
-			send(ServerMessageFactory.createUserlistMessage(names.toArray(new String[0])).toByteArray());
+			send(getUserList().toByteArray());
 			break;
 		}
 		}
@@ -105,6 +120,15 @@ public class ClientInstance extends Thread {
 	
 	public void send(byte[] bytes) throws IOException {
 		out.write(bytes);
+	}
+	
+	private Message getUserList() {
+		List<String> names = new ArrayList<String>();
+		for(ClientInstance c: server.getClients()) {
+			names.add(c.getNickName());
+		}
+		
+		return ServerMessageFactory.createUserlistMessage(names.toArray(new String[0]));
 	}
 	
 	public String getNickName() {

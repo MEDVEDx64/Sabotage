@@ -30,15 +30,8 @@ public class MessageReader {
 			return false;
 		
 		try {
-			while(bytesRead > 0) {
-				Message m = new Message(buffer);
-				bytesRead -= Message.HEADER_LENGTH + m.getPayloadLength();
-				if(bytesRead < 0)
-					throw new IllegalStateException("Suddently I noticed "
-							+ "that message length exceed valid limits");
-				pool.add(m);
-			}
-			leftover = null;
+			Message m = new Message(buffer);
+			pool.add(m);
 		}
 		catch(TruncatedMessageException e) {
 			leftover = new byte[bytesRead];
@@ -49,7 +42,7 @@ public class MessageReader {
 	}
 	
 	public Message[] collect() {
-		Message[] arr = (Message[])pool.toArray();
+		Message[] arr = pool.toArray(new Message[0]);
 		pool.clear();
 		return arr;
 	}
