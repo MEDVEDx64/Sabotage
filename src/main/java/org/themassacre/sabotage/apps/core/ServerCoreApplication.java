@@ -25,7 +25,7 @@ public class ServerCoreApplication extends FailsafeApplication implements Server
 			logger.info("Listening on port " + port);
 			while(true) {
 				Socket s = ss.accept();
-				logger.info("Accepted connection from " + s);
+				logger.info("Accepted connection from " + s.getInetAddress().getHostAddress() + ":" + s.getPort());
 				ClientInstance client;
 				try {
 					client = new ClientInstance(s, this);

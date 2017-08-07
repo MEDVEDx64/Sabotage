@@ -24,7 +24,7 @@ public class ClientInstance extends Thread {
 	public ClientInstance(Socket s, ServerInstance srv) throws IOException {
 		socket = s;
 		server = srv;
-		setName("client thread " + s);
+		setName("client thread - " + s.getInetAddress().getHostAddress() + ":" + s.getPort());
 		
 		in = new MessageReader(socket.getInputStream());
 		out = socket.getOutputStream();
