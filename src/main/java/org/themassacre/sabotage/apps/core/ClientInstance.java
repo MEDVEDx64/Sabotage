@@ -49,8 +49,10 @@ public class ClientInstance extends Thread {
 			
 			try {
 				server.broadcast(getUserList().toByteArray());
-				server.broadcast(ServerMessageFactory
-						.createNotificationMessage(nickName + " left").toByteArray());
+				if(nickName != null) {
+					server.broadcast(ServerMessageFactory
+							.createNotificationMessage(nickName + " left").toByteArray());
+				}
 				
 				logger.info("Disconnecting");
 				socket.close();
@@ -64,30 +66,44 @@ public class ClientInstance extends Thread {
 		switch(msg.getCommand()) {
 		case ClientCommand.LOGIN: {
 			String _nickName = new ClientLoginMessage(msg).getNickname();
+			if(_nickName.equals(nickName)) break;
+			
 			if(find(_nickName) != null) {
 				send(ServerMessageFactory.createNotificationMessage("Nickname already in use").toByteArray());
 				break;
 			}
 			
 			if(nickName == null) {
+				send(ServerMessageFactory.createNotificationMessage("Welcome, " + _nickName).toByteArray());
 				server.broadcast(ServerMessageFactory
 						.createNotificationMessage(_nickName + " joined").toByteArray());
-			} else {
+			} else if(nickName != _nickName) {
 				server.broadcast(ServerMessageFactory
 						.createNotificationMessage(nickName + " is now known as " + _nickName).toByteArray());
 			}
 			
 			nickName = _nickName;
 			server.broadcast(getUserList().toByteArray());
+			logger.info("Setting own nickname to " + nickName);
 			break;
 		}
 		
 		case ClientCommand.NO_ACTION: {
+			if(nickName == null) {
+				send(ServerMessageFactory.createNotificationMessage("Please log in").toByteArray());
+				break;
+			}
+			
 			server.broadcast(ServerMessageFactory.createTextMessage(nickName, msg.getPayload()).toByteArray());
 			break;
 		}
 		
 		case ClientCommand.PRIVATE: {
+			if(nickName == null) {
+				send(ServerMessageFactory.createNotificationMessage("Please log in").toByteArray());
+				break;
+			}
+			
 			ClientPrivateMessage dMsg = new ClientPrivateMessage(msg);
 			ClientInstance recipient = find(dMsg.getRecipient());
 			if(recipient == null) {
@@ -110,7 +126,7 @@ public class ClientInstance extends Thread {
 	
 	public ClientInstance find(String nickName) {
 		for(ClientInstance c: server.getClients()) {
-			if(c.getNickName() == nickName) {
+			if(nickName.equals(c.getNickName())) {
 				return c;
 			}
 		}
@@ -125,7 +141,10 @@ public class ClientInstance extends Thread {
 	private Message getUserList() {
 		List<String> names = new ArrayList<String>();
 		for(ClientInstance c: server.getClients()) {
-			names.add(c.getNickName());
+			String _nickName = c.getNickName();
+			if(_nickName != null) {
+				names.add(_nickName);
+			}
 		}
 		
 		return ServerMessageFactory.createUserlistMessage(names.toArray(new String[0]));

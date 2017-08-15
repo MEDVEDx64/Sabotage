@@ -48,7 +48,9 @@ public class ServerCoreApplication extends FailsafeApplication implements Server
 	@Override
 	public void broadcast(byte[] bytes) throws IOException {
 		for(ClientInstance c: clients) {
-			c.send(bytes);
+			if(c.getNickName() != null) {
+				c.send(bytes);
+			}
 		}
 	}
 
