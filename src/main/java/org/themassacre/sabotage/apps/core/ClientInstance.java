@@ -3,10 +3,12 @@ package org.themassacre.sabotage.apps.core;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.themassacre.sabotage.utils.CaseInsensitiveComparator;
 import org.themassacre.tpmp.generic.TpmpException;
 import org.themassacre.tpmp.io.MessageReader;
 import org.themassacre.tpmp.packets.*;
@@ -147,6 +149,7 @@ public class ClientInstance extends Thread {
 			}
 		}
 		
+		Collections.sort(names, new CaseInsensitiveComparator());
 		return ServerMessageFactory.createUserlistMessage(names.toArray(new String[0]));
 	}
 	
