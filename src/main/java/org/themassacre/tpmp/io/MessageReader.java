@@ -7,10 +7,10 @@ import org.themassacre.tpmp.generic.TpmpException;
 import org.themassacre.tpmp.packets.*;
 
 public class MessageReader {
-	InputStream stream;
-	List<Message> pool = new ArrayList<Message>();
-	byte[] buffer = new byte[Message.HEADER_LENGTH + Message.MAX_PAYLOAD_LENGTH];
-	byte[] leftover = null;
+	private InputStream stream;
+	private List<Message> pool = new ArrayList<Message>();
+	private byte[] buffer = new byte[Message.HEADER_LENGTH + Message.MAX_PAYLOAD_LENGTH];
+	private byte[] leftover = null;
 	
 	public MessageReader(InputStream stream) {
 		this.stream = stream;

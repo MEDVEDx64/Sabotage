@@ -79,7 +79,7 @@ public class ClientInstance extends Thread {
 				send(ServerMessageFactory.createNotificationMessage("Welcome, " + _nickName).toByteArray());
 				server.broadcast(ServerMessageFactory
 						.createNotificationMessage(_nickName + " joined").toByteArray());
-			} else if(nickName != _nickName) {
+			} else if(!nickName.equals(_nickName)) {
 				server.broadcast(ServerMessageFactory
 						.createNotificationMessage(nickName + " is now known as " + _nickName).toByteArray());
 			}

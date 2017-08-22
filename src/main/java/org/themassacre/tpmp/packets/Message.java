@@ -22,6 +22,10 @@ public class Message {
 		command = buffer[0] >> 1;
 		int length = buffer[2];
 		length |= (buffer[1] << 8);
+		if(length < 0) {
+			length += 256;
+		}
+
 		if(length > buffer.length - HEADER_LENGTH)
 			throw new TruncatedMessageException("Message seems to be not received fully");
 		
